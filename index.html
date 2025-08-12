@@ -117,7 +117,11 @@
       box-shadow: 0 4px 1212px rgba(0, 0, 0, 0.3);
       z-index: 9999;
     }
-  </style>
+  
+    @media print {
+      .no-print { display: none !important; }
+    }
+</style>
 </head>
 <body>
 <div class="card" id="carnet">
@@ -205,28 +209,34 @@
 </div>
 </fieldset>
 </div>
+<div class="no-print" style="margin-bottom: 15px; padding: 10px; background-color: #f9f9f9; border-radius: 8px; border: 1px solid #ddd;">
+<label><input checked="" class="col-toggle" data-col="fisica" type="checkbox"/> Terapia Física</label>
+<label style="margin-left: 15px;"><input checked="" class="col-toggle" data-col="ocupacional" type="checkbox"/> Terapia Ocupacional</label>
+<label style="margin-left: 15px;"><input checked="" class="col-toggle" data-col="psicologia" type="checkbox"/> Psicología</label>
+<label style="margin-left: 15px;"><input checked="" class="col-toggle" data-col="neuro" type="checkbox"/> Terapia Neuropsicología</label>
+</div>
 <table class="schedule">
 <tr>
 <th>Nº</th>
 <th>Fecha Cita</th>
-<th>Terapia Física</th>
-<th>Terapia Ocupacional</th>
-<th>Psicología</th>
-</tr>
+<th data-col="fisica">Terapia Física</th>
+<th data-col="ocupacional">Terapia Ocupacional</th>
+<th data-col="psicologia">Psicología</th>
+<th data-col="neuro">Terapia Neuropsicología</th></tr>
 <tr>
 <td>1</td>
 <td><input type="date"/></td>
-<td><input placeholder="Hora y sesiones" type="text"/></td>
-<td><input placeholder="Hora y sesiones" type="text"/></td>
-<td><input placeholder="Hora y sesiones" type="text"/></td>
-</tr>
+<td data-col="fisica"><input placeholder="Hora y sesiones" type="text"/></td>
+<td data-col="ocupacional"><input placeholder="Hora y sesiones" type="text"/></td>
+<td data-col="psicologia"><input placeholder="Hora y sesiones" type="text"/></td>
+<td data-col="neuro"><input placeholder="Hora y sesiones" type="text"/></td></tr>
 <tr>
 <td>2</td>
 <td><input type="date"/></td>
-<td><input placeholder="Hora y sesiones" type="text"/></td>
-<td><input placeholder="Hora y sesiones" type="text"/></td>
-<td><input placeholder="Hora y sesiones" type="text"/></td>
-</tr>
+<td data-col="fisica"><input placeholder="Hora y sesiones" type="text"/></td>
+<td data-col="ocupacional"><input placeholder="Hora y sesiones" type="text"/></td>
+<td data-col="psicologia"><input placeholder="Hora y sesiones" type="text"/></td>
+<td data-col="neuro"><input placeholder="Hora y sesiones" type="text"/></td></tr>
 </table>
 <div class="signature">
     Entregado por: <input placeholder="Nombre quien Entrega el Carnet" type="text"/>
@@ -320,41 +330,94 @@
       select.selectedIndex = 0;
     });
   }
+
 </script>
 <script>
-function agregarFila() {
-    const tabla = document.querySelector("table");
-    const fila = tabla.insertRow(-1);
-    const numeroSesion = tabla.rows.length - 1;
-    fila.innerHTML = `
-        <td>${numeroSesion}</td>
-        <td><input type="date" /></td>
-        <td><input type="text" placeholder="Hora y sesiones" /></td>
-        <td><input type="text" placeholder="Hora y sesiones" /></td>
-        <td><input type="text" placeholder="Hora y sesiones" /></td>
-    `;
-}
-
-function limpiarFormulario() {
-    document.querySelectorAll('input').forEach(input => {
-        if (input.type === 'text' || input.type === 'date') {
-            input.value = '';
-        }
+document.querySelectorAll('.col-toggle').forEach(checkbox => {
+  checkbox.addEventListener('change', function() {
+    const colName = this.getAttribute('data-col');
+    const show = this.checked;
+    document.querySelectorAll('[data-col="' + colName + '"]').forEach(cell => {
+      cell.style.display = show ? '' : 'none';
     });
-    const tabla = document.querySelector("table");
-    while (tabla.rows.length > 1) {
-        tabla.deleteRow(1);
+    document.querySelectorAll('th[data-col="' + colName + '"]').forEach(th => {
+      th.style.display = show ? '' : 'none';
+    });
+  });
+});
+</script>
+
+<!-- FUNCIÓN agregarFila arreglada (NO TOCAR nada más) -->
+<script>
+function agregarFila() {
+    const table = document.querySelector('.schedule');
+    // ensure tbody exists and move existing rows into it (preserve header)
+    let tbody = table.querySelector('tbody');
+    if (!tbody) {
+        tbody = document.createElement('tbody');
+        const rows = Array.from(table.querySelectorAll('tr')).slice(1); // skip header
+        rows.forEach(r => tbody.appendChild(r));
+        table.appendChild(tbody);
     }
-    for (let i = 1; i <= 5; i++) {
-        const fila = tabla.insertRow(-1);
-        fila.innerHTML = `
-            <td>${i}</td>
-            <td><input type="date" /></td>
-            <td><input type="text" placeholder="Hora y sesiones" /></td>
-            <td><input type="text" placeholder="Hora y sesiones" /></td>
-            <td><input type="text" placeholder="Hora y sesiones" /></td>
-        `;
-    }
+
+    const rowCount = tbody.querySelectorAll('tr').length;
+    const row = document.createElement('tr');
+
+    // Nº
+    const tdNum = document.createElement('td');
+    tdNum.textContent = rowCount + 1;
+    row.appendChild(tdNum);
+
+    // Fecha Cita
+    const tdFecha = document.createElement('td');
+    const inputFecha = document.createElement('input');
+    inputFecha.type = 'date';
+    tdFecha.appendChild(inputFecha);
+    row.appendChild(tdFecha);
+
+    // Terapia Física
+    const tdFisica = document.createElement('td');
+    tdFisica.setAttribute('data-col', 'fisica');
+    const inputFisica = document.createElement('input');
+    inputFisica.placeholder = 'Hora y sesiones';
+    inputFisica.type = 'text';
+    tdFisica.appendChild(inputFisica);
+    if (!document.querySelector('.col-toggle[data-col="fisica"]').checked) tdFisica.style.display = 'none';
+    row.appendChild(tdFisica);
+
+    // Terapia Ocupacional
+    const tdOcup = document.createElement('td');
+    tdOcup.setAttribute('data-col', 'ocupacional');
+    const inputOcup = document.createElement('input');
+    inputOcup.placeholder = 'Hora y sesiones';
+    inputOcup.type = 'text';
+    tdOcup.appendChild(inputOcup);
+    if (!document.querySelector('.col-toggle[data-col="ocupacional"]').checked) tdOcup.style.display = 'none';
+    row.appendChild(tdOcup);
+
+    // Psicología
+    const tdPsi = document.createElement('td');
+    tdPsi.setAttribute('data-col', 'psicologia');
+    const inputPsi = document.createElement('input');
+    inputPsi.placeholder = 'Hora y sesiones';
+    inputPsi.type = 'text';
+    tdPsi.appendChild(inputPsi);
+    if (!document.querySelector('.col-toggle[data-col="psicologia"]').checked) tdPsi.style.display = 'none';
+    row.appendChild(tdPsi);
+
+    // Terapia Neuropsicología
+    const tdNeuro = document.createElement('td');
+    tdNeuro.setAttribute('data-col', 'neuro');
+    const inputNeuro = document.createElement('input');
+    inputNeuro.placeholder = 'Hora y sesiones';
+    inputNeuro.type = 'text';
+    tdNeuro.appendChild(inputNeuro);
+    if (!document.querySelector('.col-toggle[data-col="neuro"]').checked) tdNeuro.style.display = 'none';
+    row.appendChild(tdNeuro);
+
+    tbody.appendChild(row);
 }
-</script></body>
+</script>
+
+</body>
 </html>
