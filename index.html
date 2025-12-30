@@ -74,7 +74,7 @@
       text-align: center;
     }
     .buttons button {
-      margin: x;
+      margin: 5px;
       padding: 10px 20px;
       background-color: #2C2474;
       color: white;
@@ -102,6 +102,9 @@
       input[type="time"]:not(:valid) {
         color: white !important;
       }
+      .no-print {
+        display: none !important;
+      }
     }
     #pdf-success {
       display: none;
@@ -114,12 +117,70 @@
       padding: 20px 30px;
       border-radius: 10px;
       font-size: 1.2rem;
-      box-shadow: 0 4px 1212px rgba(0, 0, 0, 0.3);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
       z-index: 9999;
     }
   
-    @media print {
-      .no-print { display: none !important; }
+    /* Estilos para el dropdown de servicios */
+    .servicios-dropdown {
+      position: relative;
+      display: inline-block;
+    }
+    
+    .servicios-btn {
+      padding: 3px 8px;
+      font-size: 10px;
+      background-color: #2C2474;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    
+    .servicios-btn:hover {
+      background-color: #1b174d;
+    }
+    
+    .servicios-menu {
+      display: none;
+      position: absolute;
+      background-color: white;
+      min-width: 200px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+      z-index: 1000;
+      border-radius: 6px;
+      padding: 8px;
+      top: 100%;
+      left: 0;
+      margin-top: 5px;
+    }
+    
+    .servicios-menu.show {
+      display: block;
+    }
+    
+    .servicio-item {
+      display: flex;
+      align-items: center;
+      padding: 6px;
+      cursor: pointer;
+      font-size: 11px;
+    }
+    
+    .servicio-item:hover {
+      background-color: #f0f0f0;
+      border-radius: 4px;
+    }
+    
+    .servicio-item input[type="checkbox"] {
+      margin-right: 8px;
+      cursor: pointer;
+    }
+    
+    .servicio-item label {
+      cursor: pointer;
+      margin: 0;
     }
 </style>
 </head>
@@ -212,7 +273,7 @@
 <fieldset>
 <legend>Ubicación</legend>
 <div class="form-row">
-<div class="form-group" style="flex: 1 1 100%;">
+<div class="form-group" style="flex: 1 1 60%;">
 <label>Dirección:</label>
 <select id="selectDireccion">
 <option disabled selected>Seleccione la sede de atención</option>
@@ -226,6 +287,30 @@
 <option value="Sede Caribe 2">Sede Caribe 2</option>
 <option value="Atención Virtual – No debe presentarse a sede">Atención Virtual – No debe presentarse a sede</option>
 </select>
+</div>
+<div class="form-group" style="flex: 0 0 auto; align-items: flex-end;">
+<label style="font-size: 9px;">Servicios:</label>
+<div class="servicios-dropdown">
+  <button type="button" class="servicios-btn no-print" onclick="toggleServiciosMenu(event)">📋 Elegir servicios</button>
+  <div class="servicios-menu no-print" id="serviciosMenu">
+    <div class="servicio-item">
+      <input type="checkbox" class="col-toggle" data-col="fisica" id="check-fisica" onchange="aplicarTerapias()"/>
+      <label for="check-fisica">Terapia Física</label>
+    </div>
+    <div class="servicio-item">
+      <input type="checkbox" class="col-toggle" data-col="ocupacional" id="check-ocupacional" onchange="aplicarTerapias()"/>
+      <label for="check-ocupacional">Terapia Ocupacional</label>
+    </div>
+    <div class="servicio-item">
+      <input type="checkbox" class="col-toggle" data-col="psicologia" id="check-psicologia" onchange="aplicarTerapias()"/>
+      <label for="check-psicologia">Psicología</label>
+    </div>
+    <div class="servicio-item">
+      <input type="checkbox" class="col-toggle" data-col="neuro" id="check-neuro" onchange="aplicarTerapias()"/>
+      <label for="check-neuro">Terapia Neuropsicología</label>
+    </div>
+  </div>
+</div>
 </div>
 </div>
 <div class="form-row" style="margin-top: 10px;">
@@ -244,39 +329,34 @@
 </fieldset>
 
 </div>
-<div class="no-print" style="margin-bottom: 15px; padding: 10px; background-color: #f9f9f9; border-radius: 8px; border: 1px solid #ddd;">
-<label><input checked="" class="col-toggle" data-col="fisica" type="checkbox"/> Terapia Física</label>
-<label style="margin-left: 15px;"><input checked="" class="col-toggle" data-col="ocupacional" type="checkbox"/> Terapia Ocupacional</label>
-<label style="margin-left: 15px;"><input checked="" class="col-toggle" data-col="psicologia" type="checkbox"/> Psicología</label>
-<label style="margin-left: 15px;"><input checked="" class="col-toggle" data-col="neuro" type="checkbox"/> Terapia Neuropsicología</label>
-</div>
+
 <table class="schedule">
 <thead>
 <tr>
 <th>Nº</th>
 <th>Fecha Cita</th>
-<th data-col="fisica">Terapia Física</th>
-<th data-col="ocupacional">Terapia Ocupacional</th>
-<th data-col="psicologia">Psicología</th>
-<th data-col="neuro">Terapia Neuropsicología</th>
+<th data-col="fisica" style="display: none;">Terapia Física</th>
+<th data-col="ocupacional" style="display: none;">Terapia Ocupacional</th>
+<th data-col="psicologia" style="display: none;">Psicología</th>
+<th data-col="neuro" style="display: none;">Terapia Neuropsicología</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td>1</td>
 <td><input type="date"/></td>
-<td data-col="fisica"><input placeholder="Hora y sesiones" type="text"/></td>
-<td data-col="ocupacional"><input placeholder="Hora y sesiones" type="text"/></td>
-<td data-col="psicologia"><input placeholder="Hora y sesiones" type="text"/></td>
-<td data-col="neuro"><input placeholder="Hora y sesiones" type="text"/></td>
+<td data-col="fisica" style="display: none;"><input placeholder="Hora y sesiones" type="text"/></td>
+<td data-col="ocupacional" style="display: none;"><input placeholder="Hora y sesiones" type="text"/></td>
+<td data-col="psicologia" style="display: none;"><input placeholder="Hora y sesiones" type="text"/></td>
+<td data-col="neuro" style="display: none;"><input placeholder="Hora y sesiones" type="text"/></td>
 </tr>
 <tr>
 <td>2</td>
 <td><input type="date"/></td>
-<td data-col="fisica"><input placeholder="Hora y sesiones" type="text"/></td>
-<td data-col="ocupacional"><input placeholder="Hora y sesiones" type="text"/></td>
-<td data-col="psicologia"><input placeholder="Hora y sesiones" type="text"/></td>
-<td data-col="neuro"><input placeholder="Hora y sesiones" type="text"/></td>
+<td data-col="fisica" style="display: none;"><input placeholder="Hora y sesiones" type="text"/></td>
+<td data-col="ocupacional" style="display: none;"><input placeholder="Hora y sesiones" type="text"/></td>
+<td data-col="psicologia" style="display: none;"><input placeholder="Hora y sesiones" type="text"/></td>
+<td data-col="neuro" style="display: none;"><input placeholder="Hora y sesiones" type="text"/></td>
 </tr>
 </tbody>
 </table>
@@ -289,7 +369,8 @@
 <div class="buttons no-print">
 <button onclick="generarPDF()">📄 Descargar como PDF</button>
 <button onclick="limpiarFormulario()">🪟 Limpiar</button>
-<button onclick="agregarFila()">➕ Agregar fila</button></div>
+<button onclick="agregarFila()">➕ Agregar fila</button>
+</div>
 <style>
   .recomendaciones {
     font-size: 0.8rem;
@@ -380,6 +461,39 @@
     }
   });
 
+  // Toggle del menú de servicios
+  function toggleServiciosMenu(event) {
+    event.stopPropagation();
+    const menu = document.getElementById('serviciosMenu');
+    menu.classList.toggle('show');
+  }
+
+  // Cerrar el menú si se hace clic fuera
+  document.addEventListener('click', function(event) {
+    const menu = document.getElementById('serviciosMenu');
+    const btn = event.target.closest('.servicios-btn');
+    if (!btn && menu.classList.contains('show')) {
+      menu.classList.remove('show');
+    }
+  });
+
+  // Función para aplicar las terapias seleccionadas
+  function aplicarTerapias() {
+    const checkboxes = document.querySelectorAll('.col-toggle');
+    
+    checkboxes.forEach(checkbox => {
+      const colName = checkbox.getAttribute('data-col');
+      const show = checkbox.checked;
+      
+      document.querySelectorAll('[data-col="' + colName + '"]').forEach(cell => {
+        cell.style.display = show ? '' : 'none';
+      });
+      document.querySelectorAll('th[data-col="' + colName + '"]').forEach(th => {
+        th.style.display = show ? '' : 'none';
+      });
+    });
+  }
+
   function generarPDF() {
     document.querySelectorAll('.no-print').forEach(el => el.style.display = 'none');
 
@@ -428,6 +542,9 @@
       if (input.type === 'text' || input.type === 'date' || input.type === 'time') {
         input.value = '';
       }
+      if (input.type === 'checkbox') {
+        input.checked = false;
+      }
     });
     document.querySelectorAll('select').forEach(select => {
       select.selectedIndex = 0;
@@ -435,22 +552,13 @@
     // Limpiar también la dirección completa y ocultar el link del mapa
     document.getElementById('direccionCompleta').value = '';
     document.getElementById('linkMapa').style.display = 'none';
+    
+    // Ocultar todas las columnas
+    document.querySelectorAll('[data-col]').forEach(el => {
+      el.style.display = 'none';
+    });
   }
 
-</script>
-<script>
-document.querySelectorAll('.col-toggle').forEach(checkbox => {
-  checkbox.addEventListener('change', function() {
-    const colName = this.getAttribute('data-col');
-    const show = this.checked;
-    document.querySelectorAll('[data-col="' + colName + '"]').forEach(cell => {
-      cell.style.display = show ? '' : 'none';
-    });
-    document.querySelectorAll('th[data-col="' + colName + '"]').forEach(th => {
-      th.style.display = show ? '' : 'none';
-    });
-  });
-});
 </script>
 
 <!-- FUNCIÓN agregarFila CORREGIDA ✅ -->
