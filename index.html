@@ -208,6 +208,41 @@
 </div>
 </div>
 </fieldset>
+
+<fieldset>
+<legend>Ubicación</legend>
+<div class="form-row">
+<div class="form-group" style="flex: 1 1 100%;">
+<label>Dirección:</label>
+<select id="selectDireccion">
+<option disabled selected>Seleccione la sede de atención</option>
+<option value="Sede Américas">Sede Américas</option>
+<option value="Piso 2 - Altos del Bosque">Piso 2 - Altos del Bosque</option>
+<option value="Piso 3">Piso 3</option>
+<option value="Piso 5 - Forest Medical Center">Piso 5 - Forest Medical Center</option>
+<option value="Piso 6 - Forest Medical Center">Piso 6 - Forest Medical Center</option>
+<option value="Calle 26 - Edificio Elemento">Calle 26 - Edificio Elemento</option>
+<option value="Sede Caribe 1">Sede Caribe 1</option>
+<option value="Sede Caribe 2">Sede Caribe 2</option>
+<option value="Atención Virtual – No debe presentarse a sede">Atención Virtual – No debe presentarse a sede</option>
+</select>
+</div>
+</div>
+<div class="form-row" style="margin-top: 10px;">
+<div class="form-group" style="flex: 1 1 100%;">
+<label>Dirección completa:</label>
+<input type="text" id="direccionCompleta" readonly style="background-color: #f0f0f0;" />
+</div>
+</div>
+<div class="form-row" style="margin-top: 5px;">
+<div class="form-group" style="flex: 1 1 100%;">
+<a id="linkMapa" href="#" target="_blank" style="color: #2C2474; text-decoration: none; font-size: 11px; display: none;">
+📍 Ver ubicación en Google Maps
+</a>
+</div>
+</div>
+</fieldset>
+
 </div>
 <div class="no-print" style="margin-bottom: 15px; padding: 10px; background-color: #f9f9f9; border-radius: 8px; border: 1px solid #ddd;">
 <label><input checked="" class="col-toggle" data-col="fisica" type="checkbox"/> Terapia Física</label>
@@ -216,27 +251,34 @@
 <label style="margin-left: 15px;"><input checked="" class="col-toggle" data-col="neuro" type="checkbox"/> Terapia Neuropsicología</label>
 </div>
 <table class="schedule">
+<thead>
 <tr>
 <th>Nº</th>
 <th>Fecha Cita</th>
 <th data-col="fisica">Terapia Física</th>
 <th data-col="ocupacional">Terapia Ocupacional</th>
 <th data-col="psicologia">Psicología</th>
-<th data-col="neuro">Terapia Neuropsicología</th></tr>
+<th data-col="neuro">Terapia Neuropsicología</th>
+</tr>
+</thead>
+<tbody>
 <tr>
 <td>1</td>
 <td><input type="date"/></td>
 <td data-col="fisica"><input placeholder="Hora y sesiones" type="text"/></td>
 <td data-col="ocupacional"><input placeholder="Hora y sesiones" type="text"/></td>
 <td data-col="psicologia"><input placeholder="Hora y sesiones" type="text"/></td>
-<td data-col="neuro"><input placeholder="Hora y sesiones" type="text"/></td></tr>
+<td data-col="neuro"><input placeholder="Hora y sesiones" type="text"/></td>
+</tr>
 <tr>
 <td>2</td>
 <td><input type="date"/></td>
 <td data-col="fisica"><input placeholder="Hora y sesiones" type="text"/></td>
 <td data-col="ocupacional"><input placeholder="Hora y sesiones" type="text"/></td>
 <td data-col="psicologia"><input placeholder="Hora y sesiones" type="text"/></td>
-<td data-col="neuro"><input placeholder="Hora y sesiones" type="text"/></td></tr>
+<td data-col="neuro"><input placeholder="Hora y sesiones" type="text"/></td>
+</tr>
+</tbody>
 </table>
 <div class="signature">
     Entregado por: <input placeholder="Nombre quien Entrega el Carnet" type="text"/>
@@ -277,6 +319,67 @@
 <!-- Banner de éxito -->
 <div id="pdf-success">✅ Carnet generado exitosamente</div>
 <script>
+  // Objeto con las direcciones y mapas
+  const direcciones = {
+    "Sede Américas": {
+      direccion: "CL 20 (Avenida de las Américas) # 43A - 32 - Bogotá D.C.",
+      mapa: "https://maps.app.goo.gl/F71EgmnxAHW5rnng6"
+    },
+    "Piso 2 - Altos del Bosque": {
+      direccion: "Calle 134 No. 7 - 83 Torre 1 Piso 2 - Bogotá D.C.",
+      mapa: "https://maps.app.goo.gl/zvBLNfprPDRUkX4d7"
+    },
+    "Piso 3": {
+      direccion: "Calle 134 No. 7 - 83 Torre 1 Piso 3 - Bogotá D.C.",
+      mapa: "https://maps.app.goo.gl/zvBLNfprPDRUkX4d7"
+    },
+    "Piso 5 - Forest Medical Center": {
+      direccion: "Cra 7B Bis # 132-38 Piso 5 Ed. Forest Medical Center - Bogotá D.C.",
+      mapa: "https://maps.app.goo.gl/pJaUU8DZiRhETN3A6"
+    },
+    "Piso 6 - Forest Medical Center": {
+      direccion: "Cra 7B Bis # 132-38 Piso 6 Ed. Forest Medical Center - Bogotá D.C.",
+      mapa: "https://maps.app.goo.gl/pJaUU8DZiRhETN3A6"
+    },
+    "Calle 26 - Edificio Elemento": {
+      direccion: "Avenida Calle 26 (Avenida El Dorado) # 69 - 76 - Bogotá D.C.",
+      mapa: "https://maps.app.goo.gl/duCTfW3sobBPVREG9"
+    },
+    "Sede Caribe 1": {
+      direccion: "Cr. 53 #68B - 13 barrio El Prado - Barranquilla",
+      mapa: "https://maps.app.goo.gl/yDZ7d2hzodFZXCjU7"
+    },
+    "Sede Caribe 2": {
+      direccion: "Cra 53 # 70-112 LOCAL 1-A EDIFICIO SOMMACAL - Barranquilla",
+      mapa: "https://maps.app.goo.gl/4LzPNSdt7M8CQBvU6"
+    },
+    "Atención Virtual – No debe presentarse a sede": {
+      direccion: "Modalidad virtual. No requiere desplazamiento físico.",
+      mapa: "#"
+    }
+  };
+
+  // Evento para actualizar dirección cuando se selecciona una sede
+  document.getElementById('selectDireccion').addEventListener('change', function() {
+    const sedeSeleccionada = this.value;
+    const direccionCompleta = document.getElementById('direccionCompleta');
+    const linkMapa = document.getElementById('linkMapa');
+    
+    if (direcciones[sedeSeleccionada]) {
+      direccionCompleta.value = direcciones[sedeSeleccionada].direccion;
+      
+      if (direcciones[sedeSeleccionada].mapa !== "#") {
+        linkMapa.href = direcciones[sedeSeleccionada].mapa;
+        linkMapa.style.display = "inline";
+      } else {
+        linkMapa.style.display = "none";
+      }
+    } else {
+      direccionCompleta.value = "";
+      linkMapa.style.display = "none";
+    }
+  });
+
   function generarPDF() {
     document.querySelectorAll('.no-print').forEach(el => el.style.display = 'none');
 
@@ -301,7 +404,7 @@
     const element = document.getElementById('carnet');
     const opt = {
       margin: 0.2,
-      filename: 'Carnet_Rangel.pdf',
+      filename: 'Cronograma_Rangel.pdf',
       image: { type: 'jpeg', quality: 1 },
       html2canvas: { scale: 2, useCORS: true, allowTaint: true },
       jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
@@ -329,6 +432,9 @@
     document.querySelectorAll('select').forEach(select => {
       select.selectedIndex = 0;
     });
+    // Limpiar también la dirección completa y ocultar el link del mapa
+    document.getElementById('direccionCompleta').value = '';
+    document.getElementById('linkMapa').style.display = 'none';
   }
 
 </script>
@@ -347,23 +453,17 @@ document.querySelectorAll('.col-toggle').forEach(checkbox => {
 });
 </script>
 
-<!-- FUNCIÓN agregarFila arreglada (NO TOCAR nada más) -->
+<!-- FUNCIÓN agregarFila CORREGIDA ✅ -->
 <script>
 function agregarFila() {
     const table = document.querySelector('.schedule');
-    // ensure tbody exists and move existing rows into it (preserve header)
-    let tbody = table.querySelector('tbody');
-    if (!tbody) {
-        tbody = document.createElement('tbody');
-        const rows = Array.from(table.querySelectorAll('tr')).slice(1); // skip header
-        rows.forEach(r => tbody.appendChild(r));
-        table.appendChild(tbody);
-    }
-
+    const tbody = table.querySelector('tbody');
+    
+    // Contar filas existentes en tbody
     const rowCount = tbody.querySelectorAll('tr').length;
     const row = document.createElement('tr');
 
-    // Nº
+    // Nº - CORREGIDO: ahora suma 1 al conteo real
     const tdNum = document.createElement('td');
     tdNum.textContent = rowCount + 1;
     row.appendChild(tdNum);
