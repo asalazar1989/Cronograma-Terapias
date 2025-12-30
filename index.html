@@ -504,6 +504,42 @@
   function generarPDF() {
     document.querySelectorAll('.no-print').forEach(el => el.style.display = 'none');
 
+    // Contar filas en la tabla
+    const tbody = document.querySelector('.schedule tbody');
+    const numFilas = tbody.querySelectorAll('tr').length;
+    
+    // Auto-ajustar tamaño según cantidad de filas
+    const table = document.querySelector('.schedule');
+    const card = document.getElementById('carnet');
+    let escalaAplicada = false;
+    let orientacion = 'portrait';
+    
+    if (numFilas > 20) {
+      // Más de 20 filas: orientación horizontal + tamaño muy compacto
+      table.style.fontSize = '7px';
+      table.querySelectorAll('th, td').forEach(cell => {
+        cell.style.padding = '1px';
+      });
+      card.style.fontSize = '10px';
+      orientacion = 'landscape';
+      escalaAplicada = true;
+    } else if (numFilas > 12) {
+      // 13-20 filas: tamaño compacto
+      table.style.fontSize = '8px';
+      table.querySelectorAll('th, td').forEach(cell => {
+        cell.style.padding = '2px';
+      });
+      card.style.fontSize = '11px';
+      escalaAplicada = true;
+    } else if (numFilas > 8) {
+      // 9-12 filas: reducción moderada
+      table.style.fontSize = '9px';
+      table.querySelectorAll('th, td').forEach(cell => {
+        cell.style.padding = '3px';
+      });
+      escalaAplicada = true;
+    }
+
     const timeInputs = document.querySelectorAll('input[type="time"]');
     timeInputs.forEach(input => {
       if (input.value) {
@@ -528,10 +564,19 @@
       filename: 'Cronograma_Rangel.pdf',
       image: { type: 'jpeg', quality: 1 },
       html2canvas: { scale: 2, useCORS: true, allowTaint: true },
-      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+      jsPDF: { unit: 'mm', format: 'a4', orientation: orientacion }
     };
 
     html2pdf().set(opt).from(element).save().then(() => {
+      // Restaurar estilos originales
+      if (escalaAplicada) {
+        table.style.fontSize = '';
+        table.querySelectorAll('th, td').forEach(cell => {
+          cell.style.padding = '';
+        });
+        card.style.fontSize = '';
+      }
+      
       document.querySelectorAll('.no-print').forEach(el => el.style.display = 'block');
       document.querySelectorAll('.time-print').forEach(el => el.remove());
       timeInputs.forEach(input => input.style.display = 'inline');
