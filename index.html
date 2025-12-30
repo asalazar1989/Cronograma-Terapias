@@ -377,6 +377,7 @@
 <button onclick="generarPDF()">📄 Descargar como PDF</button>
 <button onclick="limpiarFormulario()">🪟 Limpiar</button>
 <button onclick="agregarFila()">➕ Agregar fila</button>
+<button onclick="quitarFila()">➖ Quitar fila</button>
 </div>
 <style>
   .recomendaciones {
@@ -686,6 +687,23 @@ function agregarFila() {
     row.appendChild(tdFono);
 
     tbody.appendChild(row);
+}
+
+// FUNCIÓN quitarFila ✅
+function quitarFila() {
+    const table = document.querySelector('.schedule');
+    const tbody = table.querySelector('tbody');
+    const rows = tbody.querySelectorAll('tr');
+    
+    // No permitir eliminar si solo quedan 2 filas o menos
+    if (rows.length <= 2) {
+        alert('⚠️ Debe haber al menos 2 filas en el cronograma');
+        return;
+    }
+    
+    // Eliminar la última fila
+    const lastRow = rows[rows.length - 1];
+    tbody.removeChild(lastRow);
 }
 </script>
 
