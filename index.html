@@ -309,6 +309,10 @@
       <input type="checkbox" class="col-toggle" data-col="neuro" id="check-neuro" onchange="aplicarTerapias()"/>
       <label for="check-neuro">Terapia Neuropsicología</label>
     </div>
+    <div class="servicio-item">
+      <input type="checkbox" class="col-toggle" data-col="fono" id="check-fono" onchange="aplicarTerapias()"/>
+      <label for="check-fono">Fonoaudiología</label>
+    </div>
   </div>
 </div>
 </div>
@@ -339,6 +343,7 @@
 <th data-col="ocupacional" style="display: none;">Terapia Ocupacional</th>
 <th data-col="psicologia" style="display: none;">Psicología</th>
 <th data-col="neuro" style="display: none;">Terapia Neuropsicología</th>
+<th data-col="fono" style="display: none;">Fonoaudiología</th>
 </tr>
 </thead>
 <tbody>
@@ -349,6 +354,7 @@
 <td data-col="ocupacional" style="display: none;"><input placeholder="Hora y sesiones" type="text"/></td>
 <td data-col="psicologia" style="display: none;"><input placeholder="Hora y sesiones" type="text"/></td>
 <td data-col="neuro" style="display: none;"><input placeholder="Hora y sesiones" type="text"/></td>
+<td data-col="fono" style="display: none;"><input placeholder="Hora y sesiones" type="text"/></td>
 </tr>
 <tr>
 <td>2</td>
@@ -357,6 +363,7 @@
 <td data-col="ocupacional" style="display: none;"><input placeholder="Hora y sesiones" type="text"/></td>
 <td data-col="psicologia" style="display: none;"><input placeholder="Hora y sesiones" type="text"/></td>
 <td data-col="neuro" style="display: none;"><input placeholder="Hora y sesiones" type="text"/></td>
+<td data-col="fono" style="display: none;"><input placeholder="Hora y sesiones" type="text"/></td>
 </tr>
 </tbody>
 </table>
@@ -622,6 +629,16 @@ function agregarFila() {
     tdNeuro.appendChild(inputNeuro);
     if (!document.querySelector('.col-toggle[data-col="neuro"]').checked) tdNeuro.style.display = 'none';
     row.appendChild(tdNeuro);
+
+    // Fonoaudiología
+    const tdFono = document.createElement('td');
+    tdFono.setAttribute('data-col', 'fono');
+    const inputFono = document.createElement('input');
+    inputFono.placeholder = 'Hora y sesiones';
+    inputFono.type = 'text';
+    tdFono.appendChild(inputFono);
+    if (!document.querySelector('.col-toggle[data-col="fono"]').checked) tdFono.style.display = 'none';
+    row.appendChild(tdFono);
 
     tbody.appendChild(row);
 }
